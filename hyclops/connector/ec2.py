@@ -190,7 +190,7 @@ class EC2Connector(BaseConnector):
             response = self.zabbix_api.host.create({
                 "host": hostname,
                 "name": visible_name,
-                "interfaces": self.addresses_to_interfaces([node.extra["dns_name"]] + node.private_ips),
+                "interfaces": self.addresses_to_interfaces(node.public_ips),
                 "groups": self.get_group_ids(owner_hostname),
                 "templates": templateids,
                 "inventory_mode": 1,
@@ -232,7 +232,7 @@ class EC2Connector(BaseConnector):
                     old_interfaces = [interface for interface in interfaces if int(interface["type"]) == type]
                     old_interfaces = sorted(old_interfaces, key=lambda x: x["interfaceid"])
                     is_main = False if old_interfaces else True
-                    for new_addr, old_interface in map(None, [node.extra["dns_name"]] + node.private_ips, old_interfaces):
+                    for new_addr, old_interface in map(None, node.public_ips, old_interfaces):
                         if new_addr and old_interface:
                             interface = self.addresses_to_interfaces(new_addr, interface_types=[type])[0]
                             interface["interfaceid"] = old_interface["interfaceid"]
